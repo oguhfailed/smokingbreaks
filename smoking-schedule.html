@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smoking Break Schedule</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #0d0d0d;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      color: #ff4444;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .break-count {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #ffaa00;
+      font-weight: bold;
+      margin-bottom: 24px;
+      letter-spacing: 1px;
+    }
+
+    .kill-warning {
+      text-align: center;
+      background: #1a0000;
+      border: 2px solid #ff2200;
+      color: #ff4444;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin: 0 auto 32px auto;
+      max-width: 520px;
+      letter-spacing: 0.5px;
+      animation: pulse-warn 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-warn {
+      0%, 100% { box-shadow: 0 0 6px #ff2200; }
+      50%       { box-shadow: 0 0 22px #ff2200; }
+    }
+
+    .schedule {
+      max-width: 540px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ── Break card ── */
+    .break-card {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      position: relative;
+      transition: border-color 0.3s;
+    }
+
+    .break-card.active {
+      border-color: #ff4444;
+      box-shadow: 0 0 14px rgba(255, 68, 68, 0.35);
+    }
+
+    .break-card.past {
+      opacity: 0.55;
+    }
+
+    .break-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .break-info {
+      flex: 1;
+    }
+
+    .break-label {
+      font-size: 0.75rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 2px;
+    }
+
+    .break-time {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .break-time span.ampm {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-left: 4px;
+    }
+
+    .break-status {
+      font-size: 0.78rem;
+      margin-top: 4px;
+      font-weight: bold;
+    }
+
+    .break-status.upcoming  { color: #55aaff; }
+    .break-status.now       { color: #ffcc00; animation: blink 1s step-start infinite; }
+    .break-status.done      { color: #555; }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .break-number {
+      font-size: 0.72rem;
+      color: #666;
+      background: #222;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-weight: bold;
+    }
+
+    /* ── Life bar connector ── */
+    .life-connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 0;
+    }
+
+    .life-connector .line {
+      width: 2px;
+      height: 10px;
+      background: #333;
+    }
+
+    .lifebar-wrapper {
+      width: 220px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 20px;
+      padding: 6px 12px;
+      text-align: center;
+    }
+
+    .lifebar-label {
+      font-size: 0.65rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .lifebar-track {
+      width: 100%;
+      height: 10px;
+      background: #222;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 3px;
+    }
+
+    .lifebar-fill {
+      height: 100%;
+      border-radius: 10px;
+      transition: width 1.2s ease, background-color 1.2s ease;
+    }
+
+    .lifebar-text {
+      font-size: 0.68rem;
+      color: #888;
+      font-style: italic;
+    }
+
+    /* ── NRT footer ── */
+    .nrt-banner {
+      max-width: 540px;
+      margin: 28px auto 0 auto;
+      background: linear-gradient(135deg, #0a1a2a, #0d2a1a);
+      border: 2px solid #00cc66;
+      border-radius: 14px;
+      padding: 22px 26px;
+      text-align: center;
+    }
+
+    .nrt-banner h2 {
+      font-size: 1.15rem;
+      color: #00cc66;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .nrt-banner p {
+      font-size: 0.9rem;
+      color: #aad4bb;
+      line-height: 1.6;
+    }
+
+    .nrt-banner p strong {
+      color: #00ff88;
+    }
+
+    /* ── Clock ── */
+    .clock {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+    }
+
+    #current-time {
+      color: #888;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🚬 Smoking Schedule</h1>
+  <div class="subtitle">Daily break tracker — stay aware, stay in control</div>
+  <div class="clock">Current time: <span id="current-time">--:--:--</span></div>
+
+  <div class="break-count" id="break-count"></div>
+
+  <div class="kill-warning" id="kill-warning">
+    ☠️ Every single cigarette shortens your life. Every one.
+  </div>
+
+  <div class="schedule" id="schedule"></div>
+
+  <div class="nrt-banner">
+    <h2>💚 Consider quitting slowly with NRT</h2>
+    <p>
+      Nicotine Replacement Therapy — patches, gum, lozenges, inhalators —
+      lets you <strong>step down your nicotine dose gradually</strong>,
+      reducing cravings without the thousands of toxic chemicals in smoke.<br /><br />
+      You don't have to quit cold turkey. <strong>Fewer breaks each week</strong>,
+      paired with NRT, is a proven path to freedom.
+      Talk to your GP or pharmacist — they want to help.
+    </p>
+  </div>
+
+  <script>
+    const BREAKS = [
+      { label: "Morning kick-off",  hour: 7,  minute: 30 },
+      { label: "Mid-morning break", hour: 9,  minute: 30 },
+      { label: "Lunch break",       hour: 12, minute: 0  },
+      { label: "Afternoon break",   hour: 16, minute: 0  },
+      { label: "Late afternoon",    hour: 17, minute: 45 },
+      { label: "Evening wind-down", hour: 21, minute: 0  },
+    ];
+
+    // Life-bar configs: how much "life" remains between break N and break N+1
+    // Starts at a high value and drops realistically across the day
+    const LIFE_SEGMENTS = [
+      { percent: 78, label: "Life depleting after break 1…" },
+      { percent: 62, label: "Life depleting after break 2…" },
+      { percent: 48, label: "Life depleting after break 3…" },
+      { percent: 34, label: "Life depleting after break 4…" },
+      { percent: 20, label: "Life depleting after break 5…" },
+    ];
+
+    function lifeColor(pct) {
+      if (pct > 60) return "#00cc44";
+      if (pct > 35) return "#aacc00";
+      if (pct > 18) return "#ffaa00";
+      return "#ff3300";
+    }
+
+    function fmt(h, m) {
+      const suffix = h < 12 ? "AM" : "PM";
+      const h12 = h % 12 === 0 ? 12 : h % 12;
+      const mm = String(m).padStart(2, "0");
+      return { h12, mm, suffix };
+    }
+
+    function breakStatus(now, breakMinutes, nextBreakMinutes) {
+      const nowMins = now.getHours() * 60 + now.getMinutes();
+      if (nowMins >= breakMinutes && nowMins < breakMinutes + 10) return "now";
+      if (nowMins >= breakMinutes) return "done";
+      return "upcoming";
+    }
+
+    function buildSchedule() {
+      const schedule = document.getElementById("schedule");
+      schedule.innerHTML = "";
+
+      document.getElementById("break-count").textContent =
+        `☠️ ${BREAKS.length} cigarette breaks scheduled today`;
+
+      const now = new Date();
+
+      BREAKS.forEach((brk, i) => {
+        const { h12, mm, suffix } = fmt(brk.hour, brk.minute);
+        const brkMins = brk.hour * 60 + brk.minute;
+        const nextMins = i + 1 < BREAKS.length
+          ? BREAKS[i + 1].hour * 60 + BREAKS[i + 1].minute
+          : Infinity;
+
+        const status = breakStatus(now, brkMins, nextMins);
+
+        // ── Break card ──
+        const card = document.createElement("div");
+        card.className = "break-card" +
+          (status === "now"  ? " active" : "") +
+          (status === "done" ? " past"   : "");
+
+        card.innerHTML = `
+          <div class="break-number">#${i + 1}</div>
+          <div class="break-icon">🚬</div>
+          <div class="break-info">
+            <div class="break-label">${brk.label}</div>
+            <div class="break-time">${h12}:${mm}<span class="ampm">${suffix}</span></div>
+            <div class="break-status ${status}">
+              ${ status === "now"      ? "⚡ NOW — lighting up"
+               : status === "done"    ? "✔ Done — damage done"
+               :                        "⏳ Upcoming" }
+            </div>
+          </div>
+        `;
+        schedule.appendChild(card);
+
+        // ── Life bar between breaks ──
+        if (i < LIFE_SEGMENTS.length) {
+          const seg = LIFE_SEGMENTS[i];
+          const pct = seg.percent;
+          const color = lifeColor(pct);
+
+          const connector = document.createElement("div");
+          connector.className = "life-connector";
+          connector.innerHTML = `
+            <div class="line"></div>
+            <div class="lifebar-wrapper">
+              <div class="lifebar-label">⬛ Life remaining</div>
+              <div class="lifebar-track">
+                <div class="lifebar-fill" style="width:${pct}%; background:${color};"></div>
+              </div>
+              <div class="lifebar-text">${seg.label}</div>
+            </div>
+            <div class="line"></div>
+          `;
+          schedule.appendChild(connector);
+        }
+      });
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById("current-time").textContent =
+        now.toLocaleTimeString("en-GB");
+      buildSchedule();
+    }
+
+    updateClock();
+    setInterval(updateClock, 10000); // refresh every 10 s
+  </script>
+</body>
+</html>
