@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Must-Know Mac Keyboard Shortcuts</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #0d0d0d;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      color: #60aaff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      font-size: 0.95rem;
+      margin-bottom: 32px;
+    }
+
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .search-bar input {
+      width: 100%;
+      max-width: 540px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar input:focus {
+      border-color: #60aaff;
+    }
+
+    .search-bar input::placeholder {
+      color: #555;
+    }
+
+    .categories {
+      max-width: 700px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .category {
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: #181818;
+      border-bottom: 1px solid #2a2a2a;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .category-icon {
+      font-size: 1.4rem;
+    }
+
+    .category-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #60aaff;
+      letter-spacing: 0.5px;
+      flex: 1;
+    }
+
+    .category-count {
+      font-size: 0.72rem;
+      background: #222;
+      color: #777;
+      border-radius: 10px;
+      padding: 2px 8px;
+    }
+
+    .shortcut-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .shortcut-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 20px;
+      border-bottom: 1px solid #1e1e1e;
+      gap: 16px;
+      transition: background 0.15s;
+    }
+
+    .shortcut-row:last-child {
+      border-bottom: none;
+    }
+
+    .shortcut-row:hover {
+      background: #181818;
+    }
+
+    .shortcut-row.hidden {
+      display: none;
+    }
+
+    .shortcut-desc {
+      font-size: 0.88rem;
+      color: #ccc;
+      flex: 1;
+    }
+
+    .shortcut-keys {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #252525;
+      border: 1px solid #404040;
+      border-bottom: 3px solid #404040;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 0.78rem;
+      font-weight: bold;
+      color: #ddd;
+      min-width: 28px;
+      text-align: center;
+      font-family: monospace;
+      white-space: nowrap;
+    }
+
+    .key.modifier {
+      color: #60aaff;
+      border-color: #2a4a7a;
+      border-bottom-color: #2a4a7a;
+      background: #0d1a2e;
+    }
+
+    .plus {
+      color: #555;
+      font-size: 0.75rem;
+    }
+
+    .tip-banner {
+      max-width: 700px;
+      margin: 28px auto 0 auto;
+      background: linear-gradient(135deg, #0a1520, #101a10);
+      border: 2px solid #60aaff;
+      border-radius: 14px;
+      padding: 20px 26px;
+      text-align: center;
+    }
+
+    .tip-banner h2 {
+      font-size: 1.05rem;
+      color: #60aaff;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .tip-banner p {
+      font-size: 0.88rem;
+      color: #99bbdd;
+      line-height: 1.6;
+    }
+
+    .tip-banner p strong {
+      color: #aaddff;
+    }
+
+    .no-results {
+      text-align: center;
+      color: #555;
+      padding: 32px;
+      font-size: 0.9rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⌨️ Mac Keyboard Shortcuts</h1>
+  <div class="subtitle">Must-know shortcuts to work faster on macOS</div>
+
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Search shortcuts…" autocomplete="off" />
+  </div>
+
+  <div class="categories" id="categories"></div>
+  <div class="no-results" id="no-results">No shortcuts match your search.</div>
+
+  <div class="tip-banner">
+    <h2>💡 Pro Tip</h2>
+    <p>
+      On Mac keyboards: <strong>⌘</strong> = Command &nbsp;·&nbsp;
+      <strong>⌥</strong> = Option (Alt) &nbsp;·&nbsp;
+      <strong>⌃</strong> = Control &nbsp;·&nbsp;
+      <strong>⇧</strong> = Shift.<br /><br />
+      Master these shortcuts gradually — pick 3–4 new ones each week
+      until they become muscle memory.
+    </p>
+  </div>
+
+  <script>
+    const CATEGORIES = [
+      {
+        icon: "📋",
+        title: "Essential / Universal",
+        shortcuts: [
+          { desc: "Copy",                    keys: [["⌘","modifier"], ["C"]] },
+          { desc: "Paste",                   keys: [["⌘","modifier"], ["V"]] },
+          { desc: "Cut",                     keys: [["⌘","modifier"], ["X"]] },
+          { desc: "Undo",                    keys: [["⌘","modifier"], ["Z"]] },
+          { desc: "Redo",                    keys: [["⌘","modifier"], ["⇧","modifier"], ["Z"]] },
+          { desc: "Select All",              keys: [["⌘","modifier"], ["A"]] },
+          { desc: "Find",                    keys: [["⌘","modifier"], ["F"]] },
+          { desc: "Save",                    keys: [["⌘","modifier"], ["S"]] },
+          { desc: "Save As",                 keys: [["⌘","modifier"], ["⇧","modifier"], ["S"]] },
+          { desc: "Print",                   keys: [["⌘","modifier"], ["P"]] },
+          { desc: "New window / document",   keys: [["⌘","modifier"], ["N"]] },
+          { desc: "Open",                    keys: [["⌘","modifier"], ["O"]] },
+          { desc: "Close window",            keys: [["⌘","modifier"], ["W"]] },
+          { desc: "Quit app",                keys: [["⌘","modifier"], ["Q"]] },
+        ],
+      },
+      {
+        icon: "🖥️",
+        title: "System & Navigation",
+        shortcuts: [
+          { desc: "Switch between apps",              keys: [["⌘","modifier"], ["Tab"]] },
+          { desc: "Switch windows of same app",       keys: [["⌘","modifier"], ["`"]] },
+          { desc: "Spotlight Search",                 keys: [["⌘","modifier"], ["Space"]] },
+          { desc: "Mission Control (all windows)",    keys: [["⌃","modifier"], ["↑"]] },
+          { desc: "Show desktop",                     keys: [["⌘","modifier"], ["F3"]] },
+          { desc: "Lock screen",                      keys: [["⌘","modifier"], ["⌃","modifier"], ["Q"]] },
+          { desc: "Sleep display",                    keys: [["⌃","modifier"], ["⇧","modifier"], ["Power"]] },
+          { desc: "Force Quit dialog",                keys: [["⌘","modifier"], ["⌥","modifier"], ["Esc"]] },
+          { desc: "Screenshot (full screen)",         keys: [["⌘","modifier"], ["⇧","modifier"], ["3"]] },
+          { desc: "Screenshot (selected area)",       keys: [["⌘","modifier"], ["⇧","modifier"], ["4"]] },
+          { desc: "Screenshot tool / record screen",  keys: [["⌘","modifier"], ["⇧","modifier"], ["5"]] },
+          { desc: "Open Notification Center",         keys: [["⌘","modifier"], ["⌥","modifier"], ["N"]] },
+        ],
+      },
+      {
+        icon: "📁",
+        title: "Finder",
+        shortcuts: [
+          { desc: "New Finder window",          keys: [["⌘","modifier"], ["N"]] },
+          { desc: "New folder",                 keys: [["⌘","modifier"], ["⇧","modifier"], ["N"]] },
+          { desc: "Open selected item",         keys: [["⌘","modifier"], ["O"]] },
+          { desc: "Get Info (properties)",      keys: [["⌘","modifier"], ["I"]] },
+          { desc: "Move to Trash",              keys: [["⌘","modifier"], ["Delete"]] },
+          { desc: "Empty Trash",                keys: [["⌘","modifier"], ["⇧","modifier"], ["Delete"]] },
+          { desc: "Show / hide hidden files",   keys: [["⌘","modifier"], ["⇧","modifier"], ["."]] },
+          { desc: "Quick Look (preview file)",  keys: [["Space"]] },
+          { desc: "Go to folder",               keys: [["⌘","modifier"], ["⇧","modifier"], ["G"]] },
+          { desc: "Go up one folder",           keys: [["⌘","modifier"], ["↑"]] },
+          { desc: "Duplicate file",             keys: [["⌘","modifier"], ["D"]] },
+          { desc: "Rename selected file",       keys: [["Return"]] },
+        ],
+      },
+      {
+        icon: "✏️",
+        title: "Text Editing",
+        shortcuts: [
+          { desc: "Move to start of line",           keys: [["⌘","modifier"], ["←"]] },
+          { desc: "Move to end of line",             keys: [["⌘","modifier"], ["→"]] },
+          { desc: "Move to start of document",       keys: [["⌘","modifier"], ["↑"]] },
+          { desc: "Move to end of document",         keys: [["⌘","modifier"], ["↓"]] },
+          { desc: "Move word by word (left/right)",  keys: [["⌥","modifier"], ["←/→"]] },
+          { desc: "Select to start of line",         keys: [["⌘","modifier"], ["⇧","modifier"], ["←"]] },
+          { desc: "Select to end of line",           keys: [["⌘","modifier"], ["⇧","modifier"], ["→"]] },
+          { desc: "Delete word to the left",         keys: [["⌥","modifier"], ["Delete"]] },
+          { desc: "Delete to start of line",         keys: [["⌘","modifier"], ["Delete"]] },
+          { desc: "Bold",                            keys: [["⌘","modifier"], ["B"]] },
+          { desc: "Italic",                          keys: [["⌘","modifier"], ["I"]] },
+          { desc: "Underline",                       keys: [["⌘","modifier"], ["U"]] },
+        ],
+      },
+      {
+        icon: "🌐",
+        title: "Browser (Safari / Chrome)",
+        shortcuts: [
+          { desc: "New tab",                       keys: [["⌘","modifier"], ["T"]] },
+          { desc: "Close tab",                     keys: [["⌘","modifier"], ["W"]] },
+          { desc: "Reopen closed tab",             keys: [["⌘","modifier"], ["⇧","modifier"], ["T"]] },
+          { desc: "Switch to next tab",            keys: [["⌘","modifier"], ["⌥","modifier"], ["→"]] },
+          { desc: "Switch to previous tab",        keys: [["⌘","modifier"], ["⌥","modifier"], ["←"]] },
+          { desc: "Jump to tab 1–8",               keys: [["⌘","modifier"], ["1–8"]] },
+          { desc: "Address bar / Omnibox",         keys: [["⌘","modifier"], ["L"]] },
+          { desc: "Reload page",                   keys: [["⌘","modifier"], ["R"]] },
+          { desc: "Hard reload (skip cache)",      keys: [["⌘","modifier"], ["⇧","modifier"], ["R"]] },
+          { desc: "Zoom in",                       keys: [["⌘","modifier"], ["+"]] },
+          { desc: "Zoom out",                      keys: [["⌘","modifier"], ["-"]] },
+          { desc: "Actual size",                   keys: [["⌘","modifier"], ["0"]] },
+          { desc: "Developer Tools",               keys: [["⌘","modifier"], ["⌥","modifier"], ["I"]] },
+          { desc: "Bookmark page",                 keys: [["⌘","modifier"], ["D"]] },
+        ],
+      },
+      {
+        icon: "♿",
+        title: "Accessibility & Extras",
+        shortcuts: [
+          { desc: "Zoom in anywhere (must enable)", keys: [["⌘","modifier"], ["⌥","modifier"], ["="]] },
+          { desc: "Zoom out",                       keys: [["⌘","modifier"], ["⌥","modifier"], ["-"]] },
+          { desc: "Invert display colors",          keys: [["⌘","modifier"], ["⌥","modifier"], ["F5"]] },
+          { desc: "Speak selected text",            keys: [["⌥","modifier"], ["Esc"]] },
+          { desc: "Emoji & symbol picker",          keys: [["⌘","modifier"], ["⌃","modifier"], ["Space"]] },
+          { desc: "Show / hide menu bar",           keys: [["⌃","modifier"], ["F2"]] },
+          { desc: "Cycle through open dialogs",     keys: [["⌘","modifier"], ["`"]] },
+          { desc: "Move focus to Dock",             keys: [["⌃","modifier"], ["F3"]] },
+        ],
+      },
+    ];
+
+    function renderKey(parts) {
+      return parts.map(([label, mod]) =>
+        `<span class="key${mod ? ` ${mod}` : ''}">${label}</span>`
+      ).join('<span class="plus">+</span>');
+    }
+
+    function buildCategories(filter) {
+      const container = document.getElementById("categories");
+      const noResults = document.getElementById("no-results");
+      container.innerHTML = "";
+      let totalVisible = 0;
+
+      CATEGORIES.forEach(cat => {
+        const filtered = filter
+          ? cat.shortcuts.filter(s => s.desc.toLowerCase().includes(filter))
+          : cat.shortcuts;
+
+        if (filtered.length === 0) return;
+        totalVisible += filtered.length;
+
+        const section = document.createElement("div");
+        section.className = "category";
+
+        const header = document.createElement("div");
+        header.className = "category-header";
+        header.innerHTML = `
+          <span class="category-icon">${cat.icon}</span>
+          <span class="category-title">${cat.title}</span>
+          <span class="category-count">${filtered.length} shortcut${filtered.length !== 1 ? "s" : ""}</span>
+        `;
+
+        const list = document.createElement("div");
+        list.className = "shortcut-list";
+
+        filtered.forEach(sc => {
+          const row = document.createElement("div");
+          row.className = "shortcut-row";
+          row.innerHTML = `
+            <span class="shortcut-desc">${sc.desc}</span>
+            <span class="shortcut-keys">${renderKey(sc.keys)}</span>
+          `;
+          list.appendChild(row);
+        });
+
+        // Toggle collapse on header click
+        header.addEventListener("click", () => {
+          list.style.display = list.style.display === "none" ? "" : "none";
+        });
+
+        section.appendChild(header);
+        section.appendChild(list);
+        container.appendChild(section);
+      });
+
+      noResults.style.display = totalVisible === 0 ? "block" : "none";
+    }
+
+    document.getElementById("search").addEventListener("input", e => {
+      buildCategories(e.target.value.trim().toLowerCase());
+    });
+
+    buildCategories("");
+  </script>
+</body>
+</html>
