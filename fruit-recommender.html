@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Fruit Recommender</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d1a0f;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      padding: 32px 16px 48px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      color: #00cc66;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #669977;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .clock {
+      text-align: center;
+      font-size: 0.82rem;
+      color: #556655;
+      margin-bottom: 28px;
+      letter-spacing: 1px;
+    }
+
+    #current-time { color: #88aa88; font-weight: bold; }
+
+    /* ── Today's pick ── */
+    .today-card {
+      max-width: 520px;
+      margin: 0 auto 32px auto;
+      border-radius: 18px;
+      padding: 28px 30px;
+      text-align: center;
+      border: 2px solid transparent;
+      transition: border-color 0.4s, box-shadow 0.4s;
+    }
+
+    .today-card.apple  { background: #1a120d; border-color: #cc4400; box-shadow: 0 0 24px rgba(204,68,0,0.25); }
+    .today-card.orange { background: #1a150a; border-color: #cc7700; box-shadow: 0 0 24px rgba(204,119,0,0.25); }
+    .today-card.banana { background: #191900; border-color: #aaaa00; box-shadow: 0 0 24px rgba(170,170,0,0.25); }
+
+    .today-emoji { font-size: 4rem; margin-bottom: 10px; }
+
+    .today-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #88aa88;
+      margin-bottom: 4px;
+    }
+
+    .today-name {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .today-focus {
+      font-size: 0.85rem;
+      color: #aaddbb;
+      margin-bottom: 6px;
+    }
+
+    .today-serving {
+      display: inline-block;
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.78rem;
+      color: #889988;
+      margin-bottom: 14px;
+    }
+
+    .today-bestfor {
+      font-size: 0.88rem;
+      color: #ccddcc;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .today-tip {
+      font-size: 0.8rem;
+      color: #778877;
+      font-style: italic;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding-top: 10px;
+      margin-top: 6px;
+    }
+
+    /* ── Nutrient bar chart ── */
+    .section-title {
+      max-width: 520px;
+      margin: 0 auto 12px auto;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #446644;
+    }
+
+    .bar-chart {
+      max-width: 520px;
+      margin: 0 auto 32px auto;
+      background: #111a12;
+      border: 1px solid #223322;
+      border-radius: 14px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bar-fruit {
+      width: 64px;
+      font-size: 0.82rem;
+      color: #aaa;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .bar-track {
+      flex: 1;
+      background: #1e2b1e;
+      border-radius: 8px;
+      height: 18px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 8px;
+      transition: width 0.8s cubic-bezier(.4,0,.2,1);
+      min-width: 2px;
+    }
+
+    .bar-fill.apple  { background: linear-gradient(90deg, #cc4400, #ff6622); }
+    .bar-fill.orange { background: linear-gradient(90deg, #bb6600, #ffaa00); }
+    .bar-fill.banana { background: linear-gradient(90deg, #999900, #dddd00); }
+
+    .bar-value {
+      width: 70px;
+      font-size: 0.78rem;
+      color: #889988;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .bar-best { color: #00dd66; font-weight: bold; }
+
+    /* ── Nutrient table ── */
+    .nutrient-table {
+      max-width: 520px;
+      margin: 0 auto 32px auto;
+      background: #111a12;
+      border: 1px solid #223322;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .nutrient-table table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.83rem;
+    }
+
+    .nutrient-table th {
+      background: #162416;
+      color: #669966;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.7rem;
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    .nutrient-table th:not(:first-child) { text-align: center; }
+
+    .nutrient-table td {
+      padding: 9px 14px;
+      border-top: 1px solid #1a2a1a;
+      color: #bbb;
+    }
+
+    .nutrient-table td:not(:first-child) { text-align: center; }
+
+    .nutrient-table tr:hover td { background: rgba(255,255,255,0.025); }
+
+    .nutrient-table td.highlight { color: #00dd66; font-weight: bold; }
+
+    /* ── Weekly rotation ── */
+    .week-grid {
+      max-width: 520px;
+      margin: 0 auto 0 auto;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .week-day {
+      background: #111a12;
+      border: 1px solid #223322;
+      border-radius: 10px;
+      padding: 10px 6px;
+      text-align: center;
+      font-size: 0.72rem;
+    }
+
+    .week-day.today {
+      border-color: #00cc66;
+      box-shadow: 0 0 12px rgba(0,204,102,0.2);
+    }
+
+    .week-day-name {
+      color: #556655;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      font-size: 0.63rem;
+    }
+
+    .week-day.today .week-day-name { color: #00cc66; }
+
+    .week-day-emoji { font-size: 1.4rem; margin-bottom: 4px; }
+
+    .week-day-fruit { color: #88aa88; font-size: 0.68rem; }
+
+    .week-day-focus { color: #445544; font-size: 0.6rem; margin-top: 2px; }
+  </style>
+</head>
+<body>
+
+  <h1>🌿 Daily Fruit Recommender</h1>
+  <div class="subtitle">Apple · Orange · Banana — pick the best one for today</div>
+  <div class="clock">Updated: <span id="current-time">--:--</span></div>
+
+  <div id="today-card" class="today-card">
+    <div class="today-emoji" id="today-emoji"></div>
+    <div class="today-label">Today's fruit</div>
+    <div class="today-name" id="today-name"></div>
+    <div class="today-focus" id="today-focus"></div>
+    <div class="today-serving" id="today-serving"></div>
+    <div class="today-bestfor" id="today-bestfor"></div>
+    <div class="today-tip" id="today-tip"></div>
+  </div>
+
+  <div class="section-title" id="bar-title">Comparing nutrients</div>
+  <div class="bar-chart" id="bar-chart"></div>
+
+  <div class="section-title">Full nutrient snapshot (per serving)</div>
+  <div class="nutrient-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Nutrient</th>
+          <th>🍎 Apple</th>
+          <th>🍊 Orange</th>
+          <th>🍌 Banana</th>
+        </tr>
+      </thead>
+      <tbody id="nutrient-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="section-title">This week's rotation</div>
+  <div class="week-grid" id="week-grid"></div>
+
+  <script>
+    const fruits = {
+      apple: {
+        name: "Apple", emoji: "🍎", key: "apple",
+        serving: "1 medium apple (~182g)",
+        bestFor: "Gut health & antioxidants (quercetin, catechin)",
+        tip: "Eat with skin on — most nutrients are in or near the skin.",
+        nutrients: {
+          Calories:    { value: 95,   unit: "kcal"  },
+          Fiber:       { value: 4.4,  unit: "g"     },
+          "Vitamin C": { value: 8.4,  unit: "mg"    },
+          Potassium:   { value: 195,  unit: "mg"    },
+          "Vitamin B6":{ value: 0.07, unit: "mg"    },
+          Magnesium:   { value: 9,    unit: "mg"    },
+          Sugar:       { value: 19,   unit: "g"     },
+          Antioxidants:{ value: 3,    unit: "/ 5"   },
+        },
+      },
+      orange: {
+        name: "Orange", emoji: "🍊", key: "orange",
+        serving: "1 medium orange (~131g)",
+        bestFor: "Immune system — highest Vitamin C of the three",
+        tip: "Eat the whole fruit rather than juice to keep the fiber.",
+        nutrients: {
+          Calories:    { value: 62,   unit: "kcal"  },
+          Fiber:       { value: 3.1,  unit: "g"     },
+          "Vitamin C": { value: 70,   unit: "mg"    },
+          Potassium:   { value: 237,  unit: "mg"    },
+          "Vitamin B6":{ value: 0.06, unit: "mg"    },
+          Magnesium:   { value: 13,   unit: "mg"    },
+          Sugar:       { value: 12,   unit: "g"     },
+          Antioxidants:{ value: 4,    unit: "/ 5"   },
+        },
+      },
+      banana: {
+        name: "Banana", emoji: "🍌", key: "banana",
+        serving: "1 medium banana (~118g)",
+        bestFor: "Energy & muscle function — highest potassium & B6",
+        tip: "Slightly unripe bananas have more resistant starch (prebiotic).",
+        nutrients: {
+          Calories:    { value: 105,  unit: "kcal"  },
+          Fiber:       { value: 3.1,  unit: "g"     },
+          "Vitamin C": { value: 10.3, unit: "mg"    },
+          Potassium:   { value: 422,  unit: "mg"    },
+          "Vitamin B6":{ value: 0.43, unit: "mg"    },
+          Magnesium:   { value: 32,   unit: "mg"    },
+          Sugar:       { value: 14,   unit: "g"     },
+          Antioxidants:{ value: 2,    unit: "/ 5"   },
+        },
+      },
+    };
+
+    const dailyFocus = [
+      { day: "Sun", priority: "Antioxidants", label: "Antioxidant boost"     },
+      { day: "Mon", priority: "Vitamin C",    label: "Immune support"        },
+      { day: "Tue", priority: "Potassium",    label: "Heart & muscle"        },
+      { day: "Wed", priority: "Fiber",        label: "Gut health"            },
+      { day: "Thu", priority: "Vitamin B6",   label: "Brain & energy"        },
+      { day: "Fri", priority: "Magnesium",    label: "Recovery"              },
+      { day: "Sat", priority: "Calories",     label: "Lightest option"       },
+    ];
+
+    const lowerIsBetter = new Set(["Calories", "Sugar"]);
+
+    function pickBest(priority) {
+      let best = null, bestVal = null;
+      for (const f of Object.values(fruits)) {
+        const v = f.nutrients[priority].value;
+        const better = best === null ||
+          (lowerIsBetter.has(priority) ? v < bestVal : v > bestVal);
+        if (better) { best = f; bestVal = v; }
+      }
+      return best;
+    }
+
+    function render() {
+      const now = new Date();
+      const dow = now.getDay();
+      const focus = dailyFocus[dow];
+      const winner = pickBest(focus.priority);
+
+      // clock
+      document.getElementById("current-time").textContent =
+        now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) + " · " +
+        now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+      // today card
+      const card = document.getElementById("today-card");
+      card.className = "today-card " + winner.key;
+      document.getElementById("today-emoji").textContent   = winner.emoji;
+      document.getElementById("today-name").textContent    = winner.name;
+      document.getElementById("today-focus").textContent   = "Today's focus: " + focus.label;
+      document.getElementById("today-serving").textContent = winner.serving;
+      document.getElementById("today-bestfor").textContent = winner.bestFor;
+      document.getElementById("today-tip").textContent     = "💡 " + winner.tip;
+
+      // bar chart
+      document.getElementById("bar-title").textContent =
+        `Comparing — ${focus.priority} (today's priority)`;
+
+      const vals = Object.values(fruits).map(f => f.nutrients[focus.priority].value);
+      const max = Math.max(...vals);
+      const min = Math.min(...vals);
+
+      const chart = document.getElementById("bar-chart");
+      chart.innerHTML = "";
+      for (const f of Object.values(fruits)) {
+        const val = f.nutrients[focus.priority].value;
+        const unit = f.nutrients[focus.priority].unit;
+        const pct = (val / max) * 100;
+        const isBest = lowerIsBetter.has(focus.priority) ? val === min : val === max;
+
+        const row = document.createElement("div");
+        row.className = "bar-row";
+        row.innerHTML = `
+          <div class="bar-fruit">${f.emoji} ${f.name}</div>
+          <div class="bar-track">
+            <div class="bar-fill ${f.key}" style="width:${pct}%"></div>
+          </div>
+          <div class="bar-value ${isBest ? "bar-best" : ""}">
+            ${val} ${unit}${isBest ? " ✓" : ""}
+          </div>
+        `;
+        chart.appendChild(row);
+      }
+
+      // nutrient table
+      const tbody = document.getElementById("nutrient-tbody");
+      tbody.innerHTML = "";
+      const nutrientKeys = Object.keys(fruits.apple.nutrients);
+
+      for (const nk of nutrientKeys) {
+        const rowVals = Object.values(fruits).map(f => f.nutrients[nk].value);
+        const rowMax = Math.max(...rowVals);
+        const rowMin = Math.min(...rowVals);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${nk}</td>` +
+          Object.values(fruits).map(f => {
+            const v = f.nutrients[nk].value;
+            const u = f.nutrients[nk].unit;
+            const best = lowerIsBetter.has(nk) ? v === rowMin : v === rowMax;
+            return `<td class="${best ? "highlight" : ""}">${v} ${u}</td>`;
+          }).join("");
+        tbody.appendChild(tr);
+      }
+
+      // weekly grid
+      const grid = document.getElementById("week-grid");
+      grid.innerHTML = "";
+      dailyFocus.forEach((f, i) => {
+        const w = pickBest(f.priority);
+        const isToday = i === dow;
+        const div = document.createElement("div");
+        div.className = "week-day" + (isToday ? " today" : "");
+        div.innerHTML = `
+          <div class="week-day-name">${f.day}</div>
+          <div class="week-day-emoji">${w.emoji}</div>
+          <div class="week-day-fruit">${w.name}</div>
+          <div class="week-day-focus">${f.label}</div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    render();
+    setInterval(render, 60000);
+  </script>
+</body>
+</html>
