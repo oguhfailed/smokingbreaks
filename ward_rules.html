@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ward Rules Checker</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 8px;
+      color: #fff;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 40px;
+      font-size: 0.9rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 24px;
+      border-left: 5px solid #444;
+      transition: transform 0.2s;
+    }
+
+    .card:hover { transform: translateY(-4px); }
+
+    .card.free    { border-left-color: #4caf50; }
+    .card.ward3   { border-left-color: #ff5722; }
+    .card.ward5   { border-left-color: #ff9800; }
+    .card.trapped { border-left-color: #9c27b0; }
+
+    .card-name {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 14px;
+      color: #fff;
+    }
+
+    .traits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .trait {
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .trait.pass { background: #1e3a1e; color: #4caf50; }
+    .trait.fail { background: #3a1e1e; color: #ef5350; }
+
+    .verdict {
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .verdict.free    { background: #1b2e1b; color: #66bb6a; }
+    .verdict.ward3   { background: #2e1b1b; color: #ff7043; }
+    .verdict.ward5   { background: #2e231b; color: #ffa726; }
+    .verdict.trapped { background: #231b2e; color: #ce93d8; }
+
+    .rules-box {
+      max-width: 700px;
+      margin: 0 auto 40px;
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 20px 28px;
+      border: 1px solid #2a2a2a;
+    }
+
+    .rules-box h2 {
+      font-size: 1rem;
+      color: #aaa;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .rules-box ol {
+      padding-left: 18px;
+      color: #ccc;
+      line-height: 2;
+      font-size: 0.9rem;
+    }
+
+    .rules-box li span { color: #ff7043; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <h1>Ward Rules Checker</h1>
+  <p class="subtitle">Follow the rules — or face the wards.</p>
+
+  <div class="rules-box">
+    <h2>The Rules</h2>
+    <ol>
+      <li>Behave well with others, else be mindful with words — or <span>Ward 3</span></li>
+      <li>Be good to women &amp; avoid caffeine — or <span>Ward 5</span></li>
+      <li>Be a dickhead and <span>never leave this place for good</span></li>
+    </ol>
+  </div>
+
+  <div class="grid" id="output"></div>
+
+  <script>
+    const patients = [
+      { name: "Alice",   behavesWell: true,  mindfulWithWords: true,  goodToWomen: true,  drinksCaffeine: false, isDickhead: false },
+      { name: "Bob",     behavesWell: false, mindfulWithWords: true,  goodToWomen: true,  drinksCaffeine: false, isDickhead: false },
+      { name: "Charlie", behavesWell: false, mindfulWithWords: false, goodToWomen: true,  drinksCaffeine: false, isDickhead: false },
+      { name: "Dave",    behavesWell: true,  mindfulWithWords: true,  goodToWomen: false, drinksCaffeine: true,  isDickhead: false },
+      { name: "Eve",     behavesWell: true,  mindfulWithWords: true,  goodToWomen: true,  drinksCaffeine: true,  isDickhead: false },
+      { name: "Frank",   behavesWell: false, mindfulWithWords: false, goodToWomen: false, drinksCaffeine: true,  isDickhead: true  },
+    ];
+
+    const traitLabels = {
+      behavesWell:      "Behaves Well",
+      mindfulWithWords: "Mindful w/ Words",
+      goodToWomen:      "Good to Women",
+      drinksCaffeine:   "Drinks Caffeine",
+      isDickhead:       "Dickhead",
+    };
+
+    function evaluate(person) {
+      // Rule 1
+      if (!person.behavesWell && !person.mindfulWithWords) {
+        return { type: "ward3", message: "→ WARD 3 — Neither behaves well nor mindful with words." };
+      }
+      // Rule 2
+      if (!person.goodToWomen || person.drinksCaffeine) {
+        return { type: "ward5", message: "→ WARD 5 — Failed the women / caffeine test." };
+      }
+      // Rule 3
+      if (person.isDickhead) {
+        return { type: "trapped", message: "Never leaving this place. Ever." };
+      }
+      return { type: "free", message: "Free to go. All rules passed!" };
+    }
+
+    const grid = document.getElementById("output");
+
+    for (const person of patients) {
+      const result = evaluate(person);
+
+      const card = document.createElement("div");
+      card.className = `card ${result.type}`;
+
+      const name = document.createElement("div");
+      name.className = "card-name";
+      name.textContent = person.name;
+
+      const traits = document.createElement("div");
+      traits.className = "traits";
+
+      for (const [key, label] of Object.entries(traitLabels)) {
+        const tag = document.createElement("span");
+        tag.className = "trait " + (person[key] ? "pass" : "fail");
+        tag.textContent = (person[key] ? "✓ " : "✗ ") + label;
+        traits.appendChild(tag);
+      }
+
+      const verdict = document.createElement("div");
+      verdict.className = `verdict ${result.type}`;
+      verdict.textContent = result.message;
+
+      card.appendChild(name);
+      card.appendChild(traits);
+      card.appendChild(verdict);
+      grid.appendChild(card);
+    }
+  </script>
+
+</body>
+</html>
